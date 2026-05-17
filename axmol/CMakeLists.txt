@@ -198,6 +198,7 @@ option(AX_CORE_PROFILE "Whether strip deprecated features" ON)
 option(AX_EXT_HINT "The default extensions hint" ON)
 
 option(AX_ENABLE_EXT_LUA "Build lua libraries" ${AX_EXT_HINT})
+option(AX_ENABLE_EXT_JS "Build QuickJS-NG libraries" OFF)
 option(AX_ENABLE_EXT_GUI "Build extension GUI" ${AX_EXT_HINT})
 option(AX_ENABLE_EXT_ASSETMANAGER "Build extension asset-manager" ${AX_EXT_HINT})
 option(AX_ENABLE_EXT_SPINE "Build extension spine" ${AX_EXT_HINT})
