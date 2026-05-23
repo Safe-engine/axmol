@@ -45,7 +45,10 @@ This will install dependencies and configure environment variables. Restart your
 ```pwsh
 axmol new -p dev.axmol.hellocpp -d ./projects -l cpp HelloCpp
 ```
-- `-l` can be `cpp` or `lua`
+- `-l` can be `cpp`, `lua`, or `js`
+  - `cpp` - C++ native development
+  - `lua` - Lua scripting with axmol bindings
+  - `js` - JavaScript using QuickJS engine (requires `AX_WITH_QUICKJS=ON`)
 - `--portrait` optional, generates a portrait project
 
 ### 5. **Build the project**

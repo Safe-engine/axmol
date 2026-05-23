@@ -288,6 +288,10 @@ include(base/CMakeLists.txt)
 include(ui/CMakeLists.txt)
 include(network/CMakeLists.txt)
 
+if(AX_WITH_QUICKJS)
+  include(quickjs/CMakeLists.txt)
+endif()
+
 if(AX_ENABLE_AUDIO)
   include(audio/CMakeLists.txt)
 endif()
@@ -333,6 +337,11 @@ set(_AX_SRC axmol.cpp
   ${_AX_UI_SRC}
   ${_AX_NETWORK_SRC}
 )
+
+if(AX_WITH_QUICKJS)
+  list(APPEND _AX_HEADER ${_AX_QUICKJS_HEADER})
+  list(APPEND _AX_SRC ${_AX_QUICKJS_SRC})
+endif()
 
 if(AX_ENABLE_3D)
   list(APPEND _AX_HEADER ${_AX_3D_HEADER})

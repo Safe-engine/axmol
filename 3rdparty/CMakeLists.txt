@@ -14,6 +14,7 @@ option(AX_WITH_CARES "Build with internal c-ares support" OFF)
 option(AX_WITH_KCP "Build with internal kcp support" OFF)
 option(AX_WITH_OBOE "Build with oboe support" OFF)
 option(AX_WITH_LLHTTP "Build with internal LLHTTP support" ON)
+option(AX_WITH_QUICKJS "Build with internal QuickJS support" ON)
 
 # some libs not depended by axmol
 option(AX_WITH_LZ4 "Build with internal lz4 support" OFF)
@@ -377,6 +378,16 @@ endif()
 
 if(AX_WITH_LLHTTP)
   ax_add_3rd(llhttp)
+endif()
+
+# QuickJS - JavaScript engine
+if(AX_WITH_QUICKJS)
+  ax_add_3rd(3rdparty/quickjs TARGETS qjs 
+    OPTIONS
+      "QJS_ENABLE_INSTALL OFF"
+      "QJS_BUILD_EXAMPLES OFF"
+  )
+  target_include_directories(3rdparty INTERFACE "3rdparty/quickjs")
 endif()
 
 # libvlc

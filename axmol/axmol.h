@@ -259,6 +259,11 @@ THE SOFTWARE.
 #include "axmol/3d/Terrain.h"
 #include "axmol/3d/VertexInputBinding.h"
 
+// quickjs
+#ifdef AX_WITH_QUICKJS
+#include "axmol/quickjs/QuickJSEngine.h"
+#endif
+
 namespace ax
 {
 
