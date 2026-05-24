@@ -8,6 +8,7 @@
 #include "js-bindings/manual/JsBindings.h"
 
 #include "axmol/platform/FileUtils.h"
+#include "axmol/base/Logging.h"
 
 #include <cstring>
 
@@ -78,6 +79,32 @@ void JsRuntime::setErrorFromException()
     {
         _lastError = "JavaScript exception";
     }
+
+    // Try to extract stack/fileName information from the exception object
+    JSValue stack = JS_GetPropertyStr(_ctx, exc, "stack");
+    if (!JS_IsUndefined(stack))
+    {
+        const char* s = JS_ToCString(_ctx, stack);
+        if (s)
+        {
+            _lastError += std::string("\nStack: ") + s;
+            JS_FreeCString(_ctx, s);
+        }
+    }
+    JS_FreeValue(_ctx, stack);
+
+    JSValue fname = JS_GetPropertyStr(_ctx, exc, "fileName");
+    if (!JS_IsUndefined(fname))
+    {
+        const char* f = JS_ToCString(_ctx, fname);
+        if (f)
+        {
+            _lastError += std::string("\nFile: ") + f;
+            JS_FreeCString(_ctx, f);
+        }
+    }
+    JS_FreeValue(_ctx, fname);
+
     JS_FreeValue(_ctx, exc);
 }
 
@@ -121,11 +148,31 @@ bool JsRuntime::evalFile(const char* filename)
 
     const char* bytes = reinterpret_cast<const char*>(data.getBytes());
     const size_t len    = data.getSize();
+    AXLOGI("Evaluating script file: {} (size={})", path, len);
+    // Log first bytes to detect invalid UTF-8 or BOM
+    size_t show = len < 64 ? len : 64;
+    std::string hex;
+    hex.reserve(show * 3 + 1);
+    const unsigned char* ub = reinterpret_cast<const unsigned char*>(bytes);
+    for (size_t i = 0; i < show; ++i)
+    {
+        char buf[4];
+        std::snprintf(buf, sizeof(buf), "%02x ", ub[i]);
+        hex += buf;
+    }
+    AXLOGI("First {} bytes: {}", show, hex);
     JSValue result =
         JS_Eval(_ctx, bytes, len, path.c_str(), JS_EVAL_TYPE_GLOBAL);
     if (JS_IsException(result))
     {
         setErrorFromException();
+        // Append path and first-bytes hex to the last error for easier debugging
+        try
+        {
+            std::string extra = " [path=" + path + " size=" + std::to_string(len) + " first=" + hex + "]";
+            _lastError += extra;
+        }
+        catch (...) {}
         JS_FreeValue(_ctx, result);
         return false;
     }

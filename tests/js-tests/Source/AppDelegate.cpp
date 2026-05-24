@@ -42,12 +42,14 @@ bool AppDelegate::applicationDidFinishLaunching()
     director->setAnimationInterval(1.0f / 60);
 #endif
 
-    renderView->setDesignResolutionSize(320, 480, ResolutionPolicy::SHOW_ALL);
+    renderView->setDesignResolutionSize(720, 1280, ResolutionPolicy::SHOW_ALL);
 
     ScriptEngineManager::getInstance()->setScriptEngine(JsEngine::getInstance());
 
     auto scene = Scene::create();
     director->runWithScene(scene);
+    // Ensure the scene becomes the running scene before JavaScript tests execute.
+    director->drawScene();
 
     const int failed = runQuickJSTests();
 

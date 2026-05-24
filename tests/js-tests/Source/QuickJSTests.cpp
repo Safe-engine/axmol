@@ -72,7 +72,7 @@ void testEvalScriptFile(TestContext& ctx)
         return;
     }
 
-    bool ok = rt->evalFile("scripts/smoke.js");
+    bool ok = rt->evalFile("src/index.js");
     int value = 0;
     ok        = ok && rt->getGlobalInt("__axFile", value) && value == 42;
     if (!ok && !rt->getLastError().empty())
@@ -91,11 +91,24 @@ void testImageSpriteRender(TestContext& ctx)
         return;
     }
 
-    bool ok = rt->evalFile("scripts/smoke.js");
+    bool ok = rt->eval("globalThis.__axRunImageSpriteTest = 1;");
+    ok      = ok && rt->evalFile("src/index.js");
     int imageSpriteValue = 0;
     ok                   = ok && rt->getGlobalInt("__axImageSpriteTest", imageSpriteValue) && imageSpriteValue == 1;
-    if (!ok && !rt->getLastError().empty())
-        AXLOGE("  {}\n", rt->getLastError());
+    if (!ok)
+    {
+        if (!rt->getLastError().empty())
+            AXLOGE("  {}\n", rt->getLastError());
+        int stage = 0;
+        if (rt->getGlobalInt("__axImageSpriteStage", stage))
+            AXLOGE("  index.js stage: {}\n", stage);
+        int sceneNull = 0;
+        if (rt->getGlobalInt("__axImageSpriteSceneNull", sceneNull))
+            AXLOGE("  index.js sceneNull: {}\n", sceneNull);
+        int spriteNull = 0;
+        if (rt->getGlobalInt("__axImageSpriteSpriteNull", spriteNull))
+            AXLOGE("  index.js spriteNull: {}\n", spriteNull);
+    }
 
     ctx.check(ok, "image sprite render");
     rt->destroy();
