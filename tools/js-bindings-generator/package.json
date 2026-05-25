@@ -1,0 +1,13 @@
+{
+  "name": "js-bindings-generator",
+  "version": "1.0.0",
+  "description": "QuickJS Bindings Generator for Axmol written in Bun.js",
+  "main": "generator.ts",
+  "type": "module",
+  "dependencies": {
+    "yaml": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7"
+  }
+}

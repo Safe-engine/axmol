@@ -5,8 +5,10 @@
  ****************************************************************************/
 
 #include "js-bindings/manual/JsBindings.h"
+#include "js-bindings/manual/JsBasicConversions.h"
 
 #include "axmol/2d/Sprite.h"
+#include "axmol/2d/SpriteFrameCache.h"
 #include "axmol/scene/Scene.h"
 #include "axmol/scene/Node.h"
 #include "axmol/base/Director.h"
@@ -26,6 +28,8 @@ static JSClassID s_directorClassID;
 static JSClassID s_textureClassID;
 static JSClassID s_actionClassID;
 static JSClassID s_vec2ClassID;
+static JSClassID s_spriteFrameCacheClassID;
+static JSClassID s_spriteFrameClassID;
 static bool s_jsClassIDsInitialized = false;
 
 static void ensureJsClassIDs(JSRuntime* rt)
@@ -39,6 +43,14 @@ static void ensureJsClassIDs(JSRuntime* rt)
     JS_NewClassID(rt, &s_textureClassID);
     JS_NewClassID(rt, &s_actionClassID);
     JS_NewClassID(rt, &s_vec2ClassID);
+    JS_NewClassID(rt, &s_spriteFrameCacheClassID);
+    JS_NewClassID(rt, &s_spriteFrameClassID);
+
+    // Also initialize the Ref class ID for conversions
+    if (s_ax_Ref_class_id == 0) {
+        s_ax_Ref_class_id = s_spriteClassID; // We just need A class ID that we use for all Ref objects
+    }
+
     s_jsClassIDsInitialized = true;
 }
 
@@ -61,16 +73,32 @@ static JSValue js_Sprite_create(JSContext* ctx, JSValueConst this_val, int argc,
     if (!sprite)
         return JS_NULL;
 
-    // Wrap the sprite pointer in a JS object with a proper prototype.
-    JSValue obj = JS_NewObjectClass(ctx, s_spriteClassID);
-    JS_SetOpaque(obj, sprite);
-    return obj;
+    return object_to_jsval(ctx, sprite, "Sprite");
+}
+
+// Sprite.createWithSpriteFrameName(name) binding
+static JSValue js_Sprite_createWithSpriteFrameName(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv)
+{
+    if (argc < 1)
+        return JS_FALSE;
+
+    const char* name = JS_ToCString(ctx, argv[0]);
+    if (!name)
+        return JS_EXCEPTION;
+
+    Sprite* sprite = Sprite::createWithSpriteFrameName(name);
+    JS_FreeCString(ctx, name);
+
+    if (!sprite)
+        return JS_NULL;
+
+    return object_to_jsval(ctx, sprite, "Sprite");
 }
 
 // Sprite.setPosition(x, y) binding
 static JSValue js_Sprite_setPosition(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv)
 {
-    Sprite* sprite = (Sprite*)JS_GetOpaque(this_val, s_spriteClassID);
+    Sprite* sprite = (Sprite*)JS_GetOpaque(this_val, s_ax_Ref_class_id);
     if (!sprite)
         return JS_EXCEPTION;
 
@@ -88,7 +116,7 @@ static JSValue js_Sprite_setPosition(JSContext* ctx, JSValueConst this_val, int 
 // Sprite.setScale(scale) binding
 static JSValue js_Sprite_setScale(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv)
 {
-    Sprite* sprite = (Sprite*)JS_GetOpaque(this_val, s_spriteClassID);
+    Sprite* sprite = (Sprite*)JS_GetOpaque(this_val, s_ax_Ref_class_id);
     if (!sprite)
         return JS_EXCEPTION;
 
@@ -106,7 +134,7 @@ static JSValue js_Sprite_setScale(JSContext* ctx, JSValueConst this_val, int arg
 // Sprite.setAnchorPoint(x, y) binding
 static JSValue js_Sprite_setAnchorPoint(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv)
 {
-    Sprite* sprite = (Sprite*)JS_GetOpaque(this_val, s_spriteClassID);
+    Sprite* sprite = (Sprite*)JS_GetOpaque(this_val, s_ax_Ref_class_id);
     if (!sprite)
         return JS_EXCEPTION;
 
@@ -124,7 +152,7 @@ static JSValue js_Sprite_setAnchorPoint(JSContext* ctx, JSValueConst this_val, i
 // Sprite.setOpacity(opacity) binding
 static JSValue js_Sprite_setOpacity(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv)
 {
-    Sprite* sprite = (Sprite*)JS_GetOpaque(this_val, s_spriteClassID);
+    Sprite* sprite = (Sprite*)JS_GetOpaque(this_val, s_ax_Ref_class_id);
     if (!sprite)
         return JS_EXCEPTION;
 
@@ -142,7 +170,7 @@ static JSValue js_Sprite_setOpacity(JSContext* ctx, JSValueConst this_val, int a
 // Sprite.getTexture() binding
 static JSValue js_Sprite_getTexture(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv)
 {
-    Sprite* sprite = (Sprite*)JS_GetOpaque(this_val, s_spriteClassID);
+    Sprite* sprite = (Sprite*)JS_GetOpaque(this_val, s_ax_Ref_class_id);
     if (!sprite)
         return JS_EXCEPTION;
 
@@ -150,25 +178,21 @@ static JSValue js_Sprite_getTexture(JSContext* ctx, JSValueConst this_val, int a
     if (!texture)
         return JS_NULL;
 
-    // Return object wrapper
-    JSValue obj = JS_NewObjectClass(ctx, s_textureClassID);
-    JS_SetOpaque(obj, texture);
-    return obj;
+    return object_to_jsval(ctx, texture, "Texture2D");
 }
 
 // Scene.addChild(node, zorder) binding
 static JSValue js_Scene_addChild(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv)
 {
-    Scene* scene = (Scene*)JS_GetOpaque(this_val, s_sceneClassID);
+    Scene* scene = (Scene*)JS_GetOpaque(this_val, s_ax_Ref_class_id);
     if (!scene)
         return JS_EXCEPTION;
 
     if (argc < 1)
         return JS_FALSE;
 
-    JSClassID class_id;
-    Node* child = (Node*)JS_GetAnyOpaque(argv[0], &class_id);
-    if (!child)
+    Node* child = nullptr;
+    if (!jsval_to_object(ctx, argv[0], &child))
         return JS_EXCEPTION;
 
     int zorder = 0;
@@ -189,15 +213,13 @@ static JSValue js_Director_getInstance(JSContext* ctx, JSValueConst this_val, in
     if (!director)
         return JS_NULL;
 
-    JSValue obj = JS_NewObjectClass(ctx, s_directorClassID);
-    JS_SetOpaque(obj, director);
-    return obj;
+    return object_to_jsval(ctx, director, "Director");
 }
 
 // Director.getRunningScene() binding
 static JSValue js_Director_getRunningScene(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv)
 {
-    Director* director = (Director*)JS_GetOpaque(this_val, s_directorClassID);
+    Director* director = (Director*)JS_GetOpaque(this_val, s_ax_Ref_class_id);
     if (!director)
         return JS_EXCEPTION;
 
@@ -205,27 +227,54 @@ static JSValue js_Director_getRunningScene(JSContext* ctx, JSValueConst this_val
     if (!scene)
         return JS_NULL;
 
-    JSValue obj = JS_NewObjectClass(ctx, s_sceneClassID);
-    JS_SetOpaque(obj, scene);
-    return obj;
+    return object_to_jsval(ctx, scene, "Scene");
 }
 
 // Director.runScene(scene) binding
 static JSValue js_Director_runScene(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv)
 {
-    Director* director = (Director*)JS_GetOpaque(this_val, s_directorClassID);
+    Director* director = (Director*)JS_GetOpaque(this_val, s_ax_Ref_class_id);
     if (!director)
         return JS_EXCEPTION;
 
     if (argc < 1)
         return JS_FALSE;
 
-    JSClassID class_id;
-    Scene* scene = (Scene*)JS_GetAnyOpaque(argv[0], &class_id);
-    if (!scene)
+    Scene* scene = nullptr;
+    if (!jsval_to_object(ctx, argv[0], &scene))
         return JS_EXCEPTION;
 
     director->replaceScene(scene);
+    return JS_UNDEFINED;
+}
+
+// SpriteFrameCache.getInstance() binding
+static JSValue js_SpriteFrameCache_getInstance(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv)
+{
+    SpriteFrameCache* cache = SpriteFrameCache::getInstance();
+    if (!cache)
+        return JS_NULL;
+
+    return object_to_jsval(ctx, (void*)cache, "SpriteFrameCache");
+}
+
+// SpriteFrameCache.addSpriteFramesWithFile(plist) binding
+static JSValue js_SpriteFrameCache_addSpriteFramesWithFile(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv)
+{
+    SpriteFrameCache* cache = (SpriteFrameCache*)JS_GetOpaque(this_val, 0); // 0 for non-Ref class ID
+    if (!cache)
+        return JS_EXCEPTION;
+
+    if (argc < 1)
+        return JS_FALSE;
+
+    const char* plist = JS_ToCString(ctx, argv[0]);
+    if (!plist)
+        return JS_EXCEPTION;
+
+    cache->addSpriteFramesWithFile(plist);
+    JS_FreeCString(ctx, plist);
+
     return JS_UNDEFINED;
 }
 
@@ -240,7 +289,7 @@ static JSValue js_Scene_constructor(JSContext* ctx, JSValueConst new_target, int
     if (JS_IsException(proto))
         return JS_EXCEPTION;
 
-    JSValue obj = JS_NewObjectProtoClass(ctx, proto, s_sceneClassID);
+    JSValue obj = JS_NewObjectProtoClass(ctx, proto, s_ax_Ref_class_id);
     JS_FreeValue(ctx, proto);
     if (JS_IsException(obj))
         return JS_EXCEPTION;
@@ -252,7 +301,7 @@ static JSValue js_Scene_constructor(JSContext* ctx, JSValueConst new_target, int
 // Scene.onEnter() - to be called by native code
 static JSValue js_Scene_onEnter(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv)
 {
-    Scene* scene = (Scene*)JS_GetOpaque(this_val, s_sceneClassID);
+    Scene* scene = (Scene*)JS_GetOpaque(this_val, s_ax_Ref_class_id);
     if (!scene)
         return JS_EXCEPTION;
 
@@ -263,16 +312,15 @@ static JSValue js_Scene_onEnter(JSContext* ctx, JSValueConst this_val, int argc,
 // Sprite.runAction(action) binding
 static JSValue js_Sprite_runAction(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv)
 {
-    Sprite* sprite = (Sprite*)JS_GetOpaque(this_val, s_spriteClassID);
+    Sprite* sprite = (Sprite*)JS_GetOpaque(this_val, s_ax_Ref_class_id);
     if (!sprite)
         return JS_EXCEPTION;
 
     if (argc < 1)
         return JS_FALSE;
 
-    JSClassID class_id;
-    Action* action = (Action*)JS_GetAnyOpaque(argv[0], &class_id);
-    if (!action)
+    Action* action = nullptr;
+    if (!jsval_to_object(ctx, argv[0], &action))
         return JS_EXCEPTION;
 
     sprite->runAction(action);
@@ -327,9 +375,7 @@ static JSValue js_moveBy(JSContext* ctx, JSValueConst this_val, int argc, JSValu
     if (!action)
         return JS_NULL;
 
-    JSValue moveByObj = JS_NewObjectClass(ctx, s_actionClassID);
-    JS_SetOpaque(moveByObj, action);
-    return moveByObj;
+    return object_to_jsval(ctx, action, "MoveBy");
 }
 
 // View stubs
@@ -388,6 +434,20 @@ static JSValue js_game_run(JSContext* ctx, JSValueConst this_val, int argc, JSVa
     return JS_UNDEFINED;
 }
 
+// console.log binding
+static JSValue js_console_log(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv)
+{
+    for (int i = 0; i < argc; ++i)
+    {
+        const char* str = JS_ToCString(ctx, argv[i]);
+        if (str)
+        {
+            AXLOGI("{}", str);
+            JS_FreeCString(ctx, str);
+        }
+    }
+    return JS_UNDEFINED;
+}
 
 void js_register_all_bindings(JSContext* ctx)
 {
@@ -412,11 +472,17 @@ void js_register_all_bindings(JSContext* ctx)
     JS_NewClass(rt, s_actionClassID, &actionClassDef);
     JSClassDef vec2ClassDef = {"AxVec2", nullptr, nullptr, nullptr, nullptr};
     JS_NewClass(rt, s_vec2ClassID, &vec2ClassDef);
+    JSClassDef spriteFrameCacheClassDef = {"AxSpriteFrameCache", nullptr, nullptr, nullptr, nullptr};
+    JS_NewClass(rt, s_spriteFrameCacheClassID, &spriteFrameCacheClassDef);
+    JSClassDef spriteFrameClassDef = {"AxSpriteFrame", nullptr, nullptr, nullptr, nullptr};
+    JS_NewClass(rt, s_spriteFrameClassID, &spriteFrameClassDef);
 
     // Sprite class
     JSValue Sprite_class = JS_NewObject(ctx);
     JSValue sprite_create_fn = JS_NewCFunction(ctx, js_Sprite_create, "create", 1);
+    JSValue sprite_create_frame_fn = JS_NewCFunction(ctx, js_Sprite_createWithSpriteFrameName, "createWithSpriteFrameName", 1);
     JS_SetPropertyStr(ctx, Sprite_class, "create", sprite_create_fn);
+    JS_SetPropertyStr(ctx, Sprite_class, "createWithSpriteFrameName", sprite_create_frame_fn);
     JS_SetPropertyStr(ctx, ax_ns, "Sprite", Sprite_class);
 
     // Sprite prototype methods
@@ -434,6 +500,7 @@ void js_register_all_bindings(JSContext* ctx)
     JS_SetPropertyStr(ctx, sprite_proto, "getTexture", sprite_get_texture_fn);
     JS_SetPropertyStr(ctx, sprite_proto, "runAction", sprite_run_action_fn);
     JS_SetClassProto(ctx, s_spriteClassID, sprite_proto);
+    register_class_prototype(ctx, "Sprite", JS_DupValue(ctx, sprite_proto));
 
     // Scene prototype methods
     JSValue scene_proto = JS_NewObject(ctx);
@@ -441,12 +508,13 @@ void js_register_all_bindings(JSContext* ctx)
     JSValue scene_on_enter_fn = JS_NewCFunction(ctx, js_Scene_onEnter, "onEnter", 0);
     JS_SetPropertyStr(ctx, scene_proto, "addChild", scene_add_child_fn);
     JS_SetPropertyStr(ctx, scene_proto, "onEnter", scene_on_enter_fn);
+    JS_SetClassProto(ctx, s_sceneClassID, scene_proto);
+    register_class_prototype(ctx, "Scene", JS_DupValue(ctx, scene_proto));
 
     // Scene constructor
     JSValue scene_constructor_fn = JS_NewCFunction2(ctx, js_Scene_constructor, "Scene", 0, JS_CFUNC_constructor, 0);
     JS_SetConstructor(ctx, scene_constructor_fn, scene_proto);
     JS_SetPropertyStr(ctx, ax_ns, "Scene", scene_constructor_fn);
-    JS_SetClassProto(ctx, s_sceneClassID, scene_proto);
 
     // Director class
     JSValue Director_class = JS_NewObject(ctx);
@@ -461,6 +529,20 @@ void js_register_all_bindings(JSContext* ctx)
     JS_SetPropertyStr(ctx, director_proto, "getRunningScene", director_get_running_scene_fn);
     JS_SetPropertyStr(ctx, director_proto, "runScene", director_run_scene_fn);
     JS_SetClassProto(ctx, s_directorClassID, director_proto);
+    register_class_prototype(ctx, "Director", JS_DupValue(ctx, director_proto));
+
+    // SpriteFrameCache class
+    JSValue SFC_class = JS_NewObject(ctx);
+    JSValue sfc_get_instance_fn = JS_NewCFunction(ctx, js_SpriteFrameCache_getInstance, "getInstance", 0);
+    JS_SetPropertyStr(ctx, SFC_class, "getInstance", sfc_get_instance_fn);
+    JS_SetPropertyStr(ctx, ax_ns, "SpriteFrameCache", SFC_class);
+
+    // SpriteFrameCache prototype
+    JSValue sfc_proto = JS_NewObject(ctx);
+    JSValue sfc_add_frames_fn = JS_NewCFunction(ctx, js_SpriteFrameCache_addSpriteFramesWithFile, "addSpriteFramesWithFile", 1);
+    JS_SetPropertyStr(ctx, sfc_proto, "addSpriteFramesWithFile", sfc_add_frames_fn);
+    JS_SetClassProto(ctx, s_spriteFrameCacheClassID, sfc_proto);
+    register_class_prototype(ctx, "SpriteFrameCache", JS_DupValue(ctx, sfc_proto));
 
     // Global functions - exported directly to global scope
     JSValue p_fn = JS_NewCFunction(ctx, js_p, "p", 2);
@@ -512,8 +594,23 @@ void js_register_all_bindings(JSContext* ctx)
     // Register ax namespace in global
     JS_SetPropertyStr(ctx, global, "ax", ax_ns);
 
+    // console object
+    JSValue console_obj = JS_NewObject(ctx);
+    JSValue console_log_fn = JS_NewCFunction(ctx, js_console_log, "log", 1);
+    JS_SetPropertyStr(ctx, console_obj, "log", console_log_fn);
+    JS_SetPropertyStr(ctx, global, "console", console_obj);
+
     // Free the global reference only. Other values are retained by the JS engine.
     JS_FreeValue(ctx, global);
+}
+
+// Stub for auto-generated base bindings (currently no auto-generated methods)
+extern "C" {
+void register_all_axjs_base(JSContext* ctx)
+{
+    // No auto-generated Node bindings currently.
+    // All JS bindings are provided manually above.
+}
 }
 
 }  // namespace ax

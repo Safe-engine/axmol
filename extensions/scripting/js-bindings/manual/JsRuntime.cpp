@@ -57,6 +57,7 @@ bool JsRuntime::init()
 
     // Register all Axmol bindings
     js_register_all_bindings(_ctx);
+    register_all_axjs_base(_ctx);
 
     return true;
 }

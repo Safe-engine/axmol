@@ -1,0 +1,24 @@
+includes:
+  # Base directories for search paths. They will be resolved relative to axmol root.
+  - "."
+  - "3rdparty"
+  - "3rdparty/robin-map/include"
+  - "3rdparty/fmt/include"
+  - "3rdparty/rapidjson/include"
+  - "3rdparty/yasio"
+  - "extensions"
+
+ns_map:
+  "ax::": "ax."
+
+modules:
+  base:
+    output_cpp: "../../extensions/scripting/js-bindings/auto/axjs_base_auto.cpp"
+    output_hpp: "../../extensions/scripting/js-bindings/auto/axjs_base_auto.hpp"
+    headers:
+      - "axmol/scene/Node.h"
+    classes:
+      # Disabled Node binding - use manual bindings for Scene and Sprite instead
+      # - name: "ax::Node"
+      #   js_name: "Node"
+    ignore_methods: []

@@ -4,10 +4,15 @@ set(js_bindings_files
   manual/JsRuntime.cpp
   manual/JsEngine.cpp
   manual/JsBindings.cpp
+  manual/JsBasicConversions.cpp
+  manual/JsCallbacks.cpp
   manual/JsRuntime.h
   manual/JsEngine.h
   manual/JsBindings.h
+  manual/JsBasicConversions.h
+  manual/JsCallbacks.h
   manual/Js-BindingsExport.h
+  # NOTE: auto-generated bindings disabled - use manual bindings for specific classes
 )
 
 set(_AX_JS_LIB axjs CACHE INTERNAL "The axmol quickjs bindings lib name")
@@ -20,6 +25,7 @@ target_link_libraries(${_AX_JS_LIB} ${js_ext_depend})
 setup_ax_extension_config(${_AX_JS_LIB} DNTLINK)
 
 target_include_directories(${_AX_JS_LIB}
+  PRIVATE ${ax_root}
   PRIVATE ${ax_root}/3rdparty/quickjs
   PUBLIC ${ax_root}/extensions/scripting
   INTERFACE ${ax_root}/extensions/scripting/js-bindings/manual

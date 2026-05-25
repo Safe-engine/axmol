@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>frames</key>
+		<dict>
+			<key>boss.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,0},{408,251}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false/>
+				<key>sourceColorRect</key>
+				<string>{{0,0},{408,251}}</string>
+				<key>sourceSize</key>
+				<string>{408,251}</string>
+			</dict>
+
+			<key>enemy1.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{268,393},{71,53}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false/>
+				<key>sourceColorRect</key>
+				<string>{{0,0},{71,53}}</string>
+				<key>sourceSize</key>
+				<string>{71,53}</string>
+			</dict>
+
+			<key>enemy2.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{339,393},{71,55}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false/>
+				<key>sourceColorRect</key>
+				<string>{{0,0},{71,55}}</string>
+				<key>sourceSize</key>
+				<string>{71,55}</string>
+			</dict>
+
+			<key>enemy3.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{357,251},{124,95}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false/>
+				<key>sourceColorRect</key>
+				<string>{{0,0},{124,95}}</string>
+				<key>sourceSize</key>
+				<string>{124,95}</string>
+			</dict>
+
+			<key>enemy4.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{136,393},{132,92}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false/>
+				<key>sourceColorRect</key>
+				<string>{{0,0},{132,92}}</string>
+				<key>sourceSize</key>
+				<string>{132,92}</string>
+			</dict>
+
+			<key>enemy5.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,389},{136,94}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false/>
+				<key>sourceColorRect</key>
+				<string>{{0,0},{136,94}}</string>
+				<key>sourceSize</key>
+				<string>{136,94}</string>
+			</dict>
+
+			<key>enemy6.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{183,251},{174,142}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false/>
+				<key>sourceColorRect</key>
+				<string>{{0,0},{174,142}}</string>
+				<key>sourceSize</key>
+				<string>{174,142}</string>
+			</dict>
+
+			<key>enemy7.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,251},{183,138}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false/>
+				<key>sourceColorRect</key>
+				<string>{{0,0},{183,138}}</string>
+				<key>sourceSize</key>
+				<string>{183,138}</string>
+			</dict>
+
+		</dict>
+
+		<key>metadata</key>
+		<dict>
+			<key>format</key>
+			<integer>2</integer>
+			<key>size</key>
+			<string>{481,485}</string>
+			<key>textureFileName</key>
+			<string>enemy_packed.png</string>
+			</dict>
+		</dict>
+</plist>

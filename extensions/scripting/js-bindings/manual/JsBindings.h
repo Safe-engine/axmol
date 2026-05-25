@@ -18,4 +18,9 @@ namespace ax
  */
 void js_register_all_bindings(JSContext* ctx);
 
+/**
+ * Register base (auto-generated) bindings
+ */
+extern "C" void register_all_axjs_base(JSContext* ctx);
+
 }  // namespace ax
