@@ -6,6 +6,7 @@
 
 #include "js-bindings/manual/JsBindings.h"
 #include "js-bindings/manual/JsBasicConversions.h"
+#include "js-bindings/manual/core/axjs_core_manual.h"
 
 #include "axmol/2d/Sprite.h"
 #include "axmol/2d/SpriteFrameCache.h"
@@ -599,6 +600,8 @@ void js_register_all_bindings(JSContext* ctx)
     JSValue console_log_fn = JS_NewCFunction(ctx, js_console_log, "log", 1);
     JS_SetPropertyStr(ctx, console_obj, "log", console_log_fn);
     JS_SetPropertyStr(ctx, global, "console", console_obj);
+
+    js_register_core_bindings(ctx);
 
     // Free the global reference only. Other values are retained by the JS engine.
     JS_FreeValue(ctx, global);

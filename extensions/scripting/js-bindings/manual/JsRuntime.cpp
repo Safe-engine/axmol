@@ -5,7 +5,8 @@
  ****************************************************************************/
 
 #include "js-bindings/manual/JsRuntime.h"
-#include "js-bindings/manual/JsBindings.h"
+// #include "js-bindings/manual/JsBindings.h"
+#include "js-bindings/manual/core/axjs_core_manual.h"
 
 #include "axmol/platform/FileUtils.h"
 #include "axmol/base/Logging.h"
@@ -57,6 +58,7 @@ bool JsRuntime::init()
 
     // Register all Axmol bindings
     // js_register_all_bindings(_ctx);
+    js_register_core_bindings(_ctx);
 
     return true;
 }

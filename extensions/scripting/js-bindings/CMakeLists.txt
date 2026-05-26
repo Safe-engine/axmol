@@ -6,11 +6,13 @@ set(js_bindings_files
   manual/JsBindings.cpp
   manual/JsBasicConversions.cpp
   manual/JsCallbacks.cpp
+  manual/core/axjs_core_manual.cpp
   manual/JsRuntime.h
   manual/JsEngine.h
   manual/JsBindings.h
   manual/JsBasicConversions.h
   manual/JsCallbacks.h
+  manual/core/axjs_core_manual.h
   manual/Js-BindingsExport.h
   # NOTE: auto-generated bindings disabled - use manual bindings for specific classes
 )
