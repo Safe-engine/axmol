@@ -35,6 +35,7 @@
   - AX_ENABLE_EXT_EFFEKSEER: the effekseer extension, default: `FALSE` 
   - AX_ENABLE_EXT_JSONDEFAULT: the UserDefault based on json, default: `FALSE`
   - AX_ENABLE_EXT_LUA: the lua extension, default: `TRUE`
+  - AX_ENABLE_EXT_JS: the QuickJS-NG extension, default: `FALSE`
 - AX_WITH_XXX: usually user don't need care it
 - AX_RENDER_API: specify render api, valid values are: `auto`, `gl`, `mtl`, `d3d11`, `d3d12`, `vk`, default: `auto`.  
   You may also specify multiple APIs separated by semicolons, e.g. "-DAX_RENDER_API=vk;gl" This will enable both Vulkan and OpenGL backends in the build.

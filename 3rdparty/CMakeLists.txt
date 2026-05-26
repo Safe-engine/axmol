@@ -262,6 +262,15 @@ if(AX_ENABLE_EXT_LUA)
   endif()
 endif()
 
+if(AX_ENABLE_EXT_JS)
+  ax_add_3rd(quickjs TARGETS qjs OPTIONS
+    "QJS_ENABLE_INSTALL OFF"
+    "QJS_BUILD_EXAMPLES OFF"
+    "BUILD_SHARED_LIBS OFF"
+  )
+  set_property(TARGET 3rdparty APPEND PROPERTY AX_JS_DEPEND qjs)
+endif()
+
 if(AX_WITH_CURL AND NOT EMSCRIPTEN)
   ax_add_3rd(curl)
 endif()

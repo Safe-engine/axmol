@@ -7,6 +7,12 @@ define_property(TARGET
   FULL_DOCS "use to save depend libs of axmol lua project"
 )
 
+define_property(TARGET
+  PROPERTY AX_JS_DEPEND
+  BRIEF_DOCS "axmol quickjs depend libs"
+  FULL_DOCS "use to save depend libs of axmol js project"
+)
+
 if(WINDOWS)
   cmake_minimum_required(VERSION 3.27...4.3)
   cmake_policy(SET CMP0141 NEW)

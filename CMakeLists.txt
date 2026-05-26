@@ -79,4 +79,8 @@ if(AX_BUILD_TESTS)
   if(AX_ENABLE_EXT_LUA)
     add_test_target(lua-tests ${_AX_ROOT}/tests/lua-tests)
   endif(AX_ENABLE_EXT_LUA)
+
+  if(AX_ENABLE_EXT_JS)
+    add_test_target(js-tests ${_AX_ROOT}/tests/js-tests)
+  endif()
 endif()
