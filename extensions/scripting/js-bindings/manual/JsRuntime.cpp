@@ -34,11 +34,11 @@ void JsRuntime::destroy()
 
 JsRuntime::~JsRuntime()
 {
-    if (_ctx)
-    {
-        JS_FreeContext(_ctx);
-        _ctx = nullptr;
-    }
+    // if (_ctx)
+    // {
+    //     JS_FreeContext(_ctx);
+    //     _ctx = nullptr;
+    // }
     if (_rt)
     {
         JS_FreeRuntime(_rt);

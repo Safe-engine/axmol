@@ -14,8 +14,10 @@ namespace ax
 {
 
 /**
- * Register all Axmol bindings to QuickJS context
+ * Register Sprite bindings to QuickJS context
+ * Includes: create(), createWithSpriteFrameName(), setPosition(), setScale(),
+ *           setAnchorPoint(), setOpacity(), getTexture(), runAction()
  */
-void js_register_all_bindings(JSContext* ctx);
+void js_register_sprite_bindings(JSContext* ctx);
 
 }  // namespace ax

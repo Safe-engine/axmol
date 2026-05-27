@@ -7,12 +7,22 @@ set(js_bindings_files
   manual/JsBasicConversions.cpp
   manual/JsCallbacks.cpp
   manual/core/axjs_core_manual.cpp
+  manual/core/axjs_sprite_manual.cpp
+  manual/core/axjs_scene_manual.cpp
+  manual/core/axjs_director_manual.cpp
+  manual/core/axjs_action_manual.cpp
+  manual/core/axjs_node_manual.cpp
   manual/JsRuntime.h
   manual/JsEngine.h
   manual/JsBindings.h
   manual/JsBasicConversions.h
   manual/JsCallbacks.h
   manual/core/axjs_core_manual.h
+  manual/core/axjs_sprite_manual.h
+  manual/core/axjs_scene_manual.h
+  manual/core/axjs_director_manual.h
+  manual/core/axjs_action_manual.h
+  manual/core/axjs_node_manual.h
   manual/Js-BindingsExport.h
   # NOTE: auto-generated bindings disabled - use manual bindings for specific classes
 )

@@ -14,8 +14,9 @@ namespace ax
 {
 
 /**
- * Register all Axmol bindings to QuickJS context
+ * Register Scene bindings to QuickJS context
+ * Includes: constructor, addChild(), onEnter()
  */
-void js_register_all_bindings(JSContext* ctx);
+void js_register_scene_bindings(JSContext* ctx);
 
 }  // namespace ax
