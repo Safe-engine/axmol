@@ -16,11 +16,17 @@
  *   - global flag tracking (for native C++ test assertions)
  */
 
-console.log('[SpaceShooter] JS binding test start');
-
-const Scene  = ax.Scene;
+const Scene = ax.Scene;
 const Sprite = ax.Sprite;
 const SpriteFrameCache = ax.SpriteFrameCache;
+const p = ax.p;
+const moveBy = ax.moveBy;
+const view = ax.view;
+const sys = ax.sys;
+const ResolutionPolicy = ax.ResolutionPolicy;
+const game = ax.game;
+const Director = ax.Director;
+const director = Director.getInstance();
 
 // ── constants ────────────────────────────────────────────────────────────────
 const W = 720;
@@ -57,21 +63,16 @@ class GameScene extends Scene {
     }
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-//  Boot sequence (mirrors the existing test harness pattern)
-// ────────────────────────────────────────────────────────────────────────────
-global.__axFile = 42;
-
 // Allow the native C++ test to gate execution just like the old code did
 global.__jsShooterReady = 1;
 
 game.run(
     {
-        debugMode  : 1,
-        showFPS    : true,
-        frameRate  : 60,
-        id         : 'gameCanvas',
-        renderMode : 2,
+        debugMode: 1,
+        showFPS: true,
+        frameRate: 60,
+        id: 'gameCanvas',
+        renderMode: 2,
     },
     function onStart() {
         // view setup
@@ -84,14 +85,14 @@ game.run(
 
         console.log('[SpaceShooter] onStart: resolution set to', W, 'x', H);
 
-        const scene = new GameScene();
+        const scene = new Scene();
         if (!scene) {
             global.__jsShooterSceneNull = 1;
             console.log('[SpaceShooter] ERROR: scene is null');
             return;
         }
-
-        scene.onEnter();
+        console.log('[director]', director.runScene);
+        console.log('[scene]', scene);
         director.runScene(scene);
 
         global.__jsShooterStarted = 1;

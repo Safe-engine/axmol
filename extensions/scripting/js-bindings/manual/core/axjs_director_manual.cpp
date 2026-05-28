@@ -87,7 +87,7 @@ void js_register_director_bindings(JSContext* ctx)
     // Director instance exported to global
     JSValue director_instance = JS_NewObjectClass(ctx, s_ax_Ref_class_id);
     JS_SetOpaque(director_instance, Director::getInstance());
-    JS_SetPropertyStr(ctx, global, "director", director_instance);
+    JS_SetPropertyStr(ctx, ax_ns, "director", director_instance);
 
     JS_FreeValue(ctx, director_proto);
     JS_FreeValue(ctx, ax_ns);

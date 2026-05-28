@@ -21,20 +21,20 @@ void AppDelegate::initContextAttrs()
 
 bool AppDelegate::applicationDidFinishLaunching()
 {
-    ax::setLogFmtFlag(ax::LogFmtFlag::Full);
+    // ax::setLogFmtFlag(ax::LogFmtFlag::Full);
 
     auto director   = Director::getInstance();
     auto renderView = director->getRenderView();
-    if (!renderView)
-    {
-        std::string title = "JS Runtime Test";
-#ifdef AX_PLATFORM_GLFW
-        renderView = RenderViewImpl::createWithRect(title, Rect(0, 0, gWindowSize.x, gWindowSize.y), 1.0F, true);
-#else
-        renderView = RenderViewImpl::createWithRect(title, Rect(0, 0, gWindowSize.x, gWindowSize.y));
-#endif
-        director->setRenderView(renderView);
-    }
+//     if (!renderView)
+//     {
+//         std::string title = "JS Runtime Test";
+// #ifdef AX_PLATFORM_GLFW
+//         renderView = RenderViewImpl::createWithRect(title, Rect(0, 0, gWindowSize.x, gWindowSize.y), 1.0F, true);
+// #else
+//         renderView = RenderViewImpl::createWithRect(title, Rect(0, 0, gWindowSize.x, gWindowSize.y));
+// #endif
+//         director->setRenderView(renderView);
+//     }
 
 #ifdef AX_PLATFORM_PC
     director->setAnimationInterval(1.0f / Device::getDisplayRefreshRate());
@@ -42,7 +42,7 @@ bool AppDelegate::applicationDidFinishLaunching()
     director->setAnimationInterval(1.0f / 60);
 #endif
 
-    renderView->setDesignResolutionSize(720, 1280, ResolutionPolicy::SHOW_ALL);
+    // renderView->setDesignResolutionSize(720, 1280, ResolutionPolicy::SHOW_ALL);
 
     ScriptEngineManager::getInstance()->setScriptEngine(JsEngine::getInstance());
 

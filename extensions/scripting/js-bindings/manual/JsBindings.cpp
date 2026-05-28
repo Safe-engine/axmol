@@ -44,8 +44,9 @@ static void ensureJsClassIDs(JSRuntime* rt)
     JS_NewClassID(rt, &s_spriteFrameClassID);
 
     // Also initialize the Ref class ID for conversions
-    if (s_ax_Ref_class_id == 0) {
-        s_ax_Ref_class_id = s_spriteClassID; // We just need A class ID that we use for all Ref objects
+    if (s_ax_Ref_class_id == 0)
+    {
+        s_ax_Ref_class_id = s_spriteClassID;  // We just need A class ID that we use for all Ref objects
     }
 
     s_jsClassIDsInitialized = true;
@@ -62,9 +63,12 @@ static JSValue js_SpriteFrameCache_getInstance(JSContext* ctx, JSValueConst this
 }
 
 // SpriteFrameCache.addSpriteFramesWithFile(plist) binding
-static JSValue js_SpriteFrameCache_addSpriteFramesWithFile(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv)
+static JSValue js_SpriteFrameCache_addSpriteFramesWithFile(JSContext* ctx,
+                                                           JSValueConst this_val,
+                                                           int argc,
+                                                           JSValueConst* argv)
 {
-    SpriteFrameCache* cache = (SpriteFrameCache*)JS_GetOpaque(this_val, 0); // 0 for non-Ref class ID
+    SpriteFrameCache* cache = (SpriteFrameCache*)JS_GetOpaque(this_val, 0);  // 0 for non-Ref class ID
     if (!cache)
         return JS_EXCEPTION;
 
@@ -134,15 +138,21 @@ static JSValue js_game_run(JSContext* ctx, JSValueConst this_val, int argc, JSVa
 // console.log binding
 static JSValue js_console_log(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst* argv)
 {
+    std::string line;
     for (int i = 0; i < argc; ++i)
     {
         const char* str = JS_ToCString(ctx, argv[i]);
         if (str)
         {
-            AXLOGI("{}", str);
+            if (i > 0)
+            {
+                line += " ";
+            }
+            line += str;
             JS_FreeCString(ctx, str);
         }
     }
+    AXLOGI("{}", line);
     return JS_UNDEFINED;
 }
 
@@ -152,41 +162,45 @@ void js_register_all_bindings(JSContext* ctx)
         return;
 
     JSValue global = JS_GetGlobalObject(ctx);
-    JSValue ax_ns = JS_NewObject(ctx);
+    JSValue ax_ns  = JS_NewObject(ctx);
 
     JSRuntime* rt = JS_GetRuntime(ctx);
     ensureJsClassIDs(rt);
 
+    // Register ax namespace early so core bindings can attach properties to it
+    JS_SetPropertyStr(ctx, global, "ax", JS_DupValue(ctx, ax_ns));
+
     // Setup class definitions for QuickJS runtime
-    JSClassDef spriteClassDef = {"AxSprite", nullptr, nullptr, nullptr, nullptr};
+    JSClassDef spriteClassDef = {"Sprite", nullptr, nullptr, nullptr, nullptr};
     JS_NewClass(rt, s_spriteClassID, &spriteClassDef);
-    JSClassDef sceneClassDef = {"AxScene", nullptr, nullptr, nullptr, nullptr};
+    JSClassDef sceneClassDef = {"Scene", nullptr, nullptr, nullptr, nullptr};
     JS_NewClass(rt, s_sceneClassID, &sceneClassDef);
-    JSClassDef directorClassDef = {"AxDirector", nullptr, nullptr, nullptr, nullptr};
+    JSClassDef directorClassDef = {"Director", nullptr, nullptr, nullptr, nullptr};
     JS_NewClass(rt, s_directorClassID, &directorClassDef);
-    JSClassDef textureClassDef = {"AxTexture", nullptr, nullptr, nullptr, nullptr};
+    JSClassDef textureClassDef = {"Texture", nullptr, nullptr, nullptr, nullptr};
     JS_NewClass(rt, s_textureClassID, &textureClassDef);
-    JSClassDef actionClassDef = {"AxAction", nullptr, nullptr, nullptr, nullptr};
+    JSClassDef actionClassDef = {"Action", nullptr, nullptr, nullptr, nullptr};
     JS_NewClass(rt, s_actionClassID, &actionClassDef);
-    JSClassDef vec2ClassDef = {"AxVec2", nullptr, nullptr, nullptr, nullptr};
+    JSClassDef vec2ClassDef = {"Vec2", nullptr, nullptr, nullptr, nullptr};
     JS_NewClass(rt, s_vec2ClassID, &vec2ClassDef);
-    JSClassDef spriteFrameCacheClassDef = {"AxSpriteFrameCache", nullptr, nullptr, nullptr, nullptr};
+    JSClassDef spriteFrameCacheClassDef = {"SpriteFrameCache", nullptr, nullptr, nullptr, nullptr};
     JS_NewClass(rt, s_spriteFrameCacheClassID, &spriteFrameCacheClassDef);
-    JSClassDef spriteFrameClassDef = {"AxSpriteFrame", nullptr, nullptr, nullptr, nullptr};
+    JSClassDef spriteFrameClassDef = {"SpriteFrame", nullptr, nullptr, nullptr, nullptr};
     JS_NewClass(rt, s_spriteFrameClassID, &spriteFrameClassDef);
 
     // Register all core bindings (Sprite, Scene, Director, Action, Node)
     js_register_core_bindings(ctx);
 
     // SpriteFrameCache class
-    JSValue SFC_class = JS_NewObject(ctx);
+    JSValue SFC_class           = JS_NewObject(ctx);
     JSValue sfc_get_instance_fn = JS_NewCFunction(ctx, js_SpriteFrameCache_getInstance, "getInstance", 0);
     JS_SetPropertyStr(ctx, SFC_class, "getInstance", sfc_get_instance_fn);
     JS_SetPropertyStr(ctx, ax_ns, "SpriteFrameCache", SFC_class);
 
     // SpriteFrameCache prototype
     JSValue sfc_proto = JS_NewObject(ctx);
-    JSValue sfc_add_frames_fn = JS_NewCFunction(ctx, js_SpriteFrameCache_addSpriteFramesWithFile, "addSpriteFramesWithFile", 1);
+    JSValue sfc_add_frames_fn =
+        JS_NewCFunction(ctx, js_SpriteFrameCache_addSpriteFramesWithFile, "addSpriteFramesWithFile", 1);
     JS_SetPropertyStr(ctx, sfc_proto, "addSpriteFramesWithFile", sfc_add_frames_fn);
     JS_SetClassProto(ctx, s_spriteFrameCacheClassID, sfc_proto);
     register_class_prototype(ctx, "SpriteFrameCache", JS_DupValue(ctx, sfc_proto));
@@ -198,51 +212,50 @@ void js_register_all_bindings(JSContext* ctx)
 
     // View object
     JSValue view_obj = JS_NewObject(ctx);
-    JSValue view_get_design_res_fn = JS_NewCFunction(ctx, js_view_getDesignResolutionSize, "getDesignResolutionSize", 0);
-    JSValue view_enable_retina_fn = JS_NewCFunction(ctx, js_view_enableRetina, "enableRetina", 1);
+    JSValue view_get_design_res_fn =
+        JS_NewCFunction(ctx, js_view_getDesignResolutionSize, "getDesignResolutionSize", 0);
+    JSValue view_enable_retina_fn   = JS_NewCFunction(ctx, js_view_enableRetina, "enableRetina", 1);
     JSValue view_adjust_viewport_fn = JS_NewCFunction(ctx, js_view_adjustViewPort, "adjustViewPort", 1);
-    JSValue view_set_design_res_fn = JS_NewCFunction(ctx, js_view_setDesignResolutionSize, "setDesignResolutionSize", 3);
+    JSValue view_set_design_res_fn =
+        JS_NewCFunction(ctx, js_view_setDesignResolutionSize, "setDesignResolutionSize", 3);
     JSValue view_resize_browser_fn = JS_NewCFunction(ctx, js_view_resizeWithBrowserSize, "resizeWithBrowserSize", 1);
     JS_SetPropertyStr(ctx, view_obj, "getDesignResolutionSize", view_get_design_res_fn);
     JS_SetPropertyStr(ctx, view_obj, "enableRetina", view_enable_retina_fn);
     JS_SetPropertyStr(ctx, view_obj, "adjustViewPort", view_adjust_viewport_fn);
     JS_SetPropertyStr(ctx, view_obj, "setDesignResolutionSize", view_set_design_res_fn);
     JS_SetPropertyStr(ctx, view_obj, "resizeWithBrowserSize", view_resize_browser_fn);
-    JS_SetPropertyStr(ctx, global, "view", view_obj);
+    JS_SetPropertyStr(ctx, ax_ns, "view", view_obj);
 
     // sys object
     JSValue sys_obj = JS_NewObject(ctx);
     JS_SetPropertyStr(ctx, sys_obj, "os", JS_NewInt32(ctx, 0));
     JS_SetPropertyStr(ctx, sys_obj, "OS_IOS", JS_NewInt32(ctx, 1));
-    JS_SetPropertyStr(ctx, global, "sys", sys_obj);
+    JS_SetPropertyStr(ctx, ax_ns, "sys", sys_obj);
 
     // ResolutionPolicy object
     JSValue res_policy_obj = JS_NewObject(ctx);
     JS_SetPropertyStr(ctx, res_policy_obj, "FIXED_HEIGHT", JS_NewInt32(ctx, 1));
     JS_SetPropertyStr(ctx, res_policy_obj, "FIXED_WIDTH", JS_NewInt32(ctx, 2));
-    JS_SetPropertyStr(ctx, global, "ResolutionPolicy", res_policy_obj);
+    JS_SetPropertyStr(ctx, ax_ns, "ResolutionPolicy", res_policy_obj);
 
     // game object
-    JSValue game_obj = JS_NewObject(ctx);
+    JSValue game_obj    = JS_NewObject(ctx);
     JSValue game_run_fn = JS_NewCFunction(ctx, js_game_run, "run", 2);
     JS_SetPropertyStr(ctx, game_obj, "run", game_run_fn);
-    JS_SetPropertyStr(ctx, global, "game", game_obj);
+    JS_SetPropertyStr(ctx, ax_ns, "game", game_obj);
 
     // global object - already available but ensure it's accessible
     JS_SetPropertyStr(ctx, global, "global", JS_DupValue(ctx, global));
 
-    // Register ax namespace in global
-    JS_SetPropertyStr(ctx, global, "ax", ax_ns);
-
     // console object
-    JSValue console_obj = JS_NewObject(ctx);
+    JSValue console_obj    = JS_NewObject(ctx);
     JSValue console_log_fn = JS_NewCFunction(ctx, js_console_log, "log", 1);
     JS_SetPropertyStr(ctx, console_obj, "log", console_log_fn);
     JS_SetPropertyStr(ctx, global, "console", console_obj);
 
-    // Free the global reference only. Other values are retained by the JS engine.
+    // Free the ax and global references. The objects remain reachable from global scope.
+    JS_FreeValue(ctx, ax_ns);
     JS_FreeValue(ctx, global);
 }
 
 }  // namespace ax
-

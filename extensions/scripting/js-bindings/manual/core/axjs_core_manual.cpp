@@ -25,10 +25,10 @@ void js_register_core_bindings(JSContext* ctx)
 
     // Register all individual binding groups
     js_register_sprite_bindings(ctx);
-    // js_register_scene_bindings(ctx);
-    // js_register_director_bindings(ctx);
-    // js_register_action_bindings(ctx);
-    // js_register_node_bindings(ctx);
+    js_register_scene_bindings(ctx);
+    js_register_director_bindings(ctx);
+    js_register_action_bindings(ctx);
+    js_register_node_bindings(ctx);
 }
 
 }  // namespace ax
