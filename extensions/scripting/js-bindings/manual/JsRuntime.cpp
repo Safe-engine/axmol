@@ -147,37 +147,8 @@ bool JsRuntime::evalFile(const char* filename)
     }
 
     const char* bytes = reinterpret_cast<const char*>(data.getBytes());
-    const size_t len    = data.getSize();
-    AXLOGI("Evaluating script file: {} (size={})", path, len);
-    // Log first bytes to detect invalid UTF-8 or BOM
-    size_t show = len < 64 ? len : 64;
-    std::string hex;
-    hex.reserve(show * 3 + 1);
-    const unsigned char* ub = reinterpret_cast<const unsigned char*>(bytes);
-    for (size_t i = 0; i < show; ++i)
-    {
-        char buf[4];
-        std::snprintf(buf, sizeof(buf), "%02x ", ub[i]);
-        hex += buf;
-    }
-    AXLOGI("First {} bytes: {}", show, hex);
-    JSValue result =
-        JS_Eval(_ctx, bytes, len, path.c_str(), JS_EVAL_TYPE_GLOBAL);
-    if (JS_IsException(result))
-    {
-        setErrorFromException();
-        // Append path and first-bytes hex to the last error for easier debugging
-        try
-        {
-            std::string extra = " [path=" + path + " size=" + std::to_string(len) + " first=" + hex + "]";
-            _lastError += extra;
-        }
-        catch (...) {}
-        JS_FreeValue(_ctx, result);
-        return false;
-    }
-    JS_FreeValue(_ctx, result);
-    return true;
+    AXLOGI("Evaluating script file: {} (size={})", path, data.getSize());
+    return eval(bytes, path.c_str());
 }
 
 bool JsRuntime::getGlobalInt(const char* name, int& out) const

@@ -9,6 +9,7 @@ if (global.__axRunImageSpriteTest) {
 class ActionScene extends Scene {
     onEnter() {
         global.__axImageSpriteStage = 2;
+        console.log('ActionScene onEnter');
         super.onEnter();
 
         const size = view.getDesignResolutionSize();
@@ -53,7 +54,7 @@ game.run(
             return;
         }
 
-        scene.onEnter();
+        // scene.onEnter();
         director.runScene(scene);
     }
 );
