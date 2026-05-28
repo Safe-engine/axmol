@@ -12,7 +12,7 @@ class ActionScene extends Scene {
         super.onEnter();
 
         const size = view.getDesignResolutionSize();
-        const sprite = Sprite.create('res/spaceship.png');
+        const sprite = Sprite.create('res/Hello.png');
         if (!sprite) {
             global.__axImageSpriteSpriteNull = 1;
             return;
