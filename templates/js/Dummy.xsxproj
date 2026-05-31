@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<Project fullMode="0">
+  <assets>
+    <item path="CMakeLists.txt" dflag="131076" />
+    <item path="Content/src/config.js" dflag="131076" />
+    <item path="Content/src/main.js" dflag="131076" />
+  </assets>
+  <debug-options>
+    <start-program>build\bin\Dummy\Debug\Dummy.exe</start-program>
+    <start-working-dir>.\Content</start-working-dir>
+    <start-command />
+    <search-paths>
+      <item>src</item>
+    </search-paths>
+  </debug-options>
+  <project-home>.</project-home>
+  <ssheets />
+  <assets.ref />
+</Project>

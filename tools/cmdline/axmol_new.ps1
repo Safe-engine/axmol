@@ -37,7 +37,7 @@ if ($packageName.Contains('-')) {
 $sourcePath = Join-Path $env:AX_ROOT "templates/$lang"
 
 if (!(Test-Path $sourcePath)) {
-    throw 'Invalid lang, valid is cpp or lua'
+    throw 'Invalid lang, valid is cpp, lua or js'
 }
 
 $destinationPath = Join-Path $directory $projectName
