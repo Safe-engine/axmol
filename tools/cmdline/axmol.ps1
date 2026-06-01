@@ -264,8 +264,8 @@ options:
                         [optional] Set a package name for project, default is dev.axmol.demo.
     -d DIRECTORY
                         [optional] Set the path where to place the new project, default is current directory.
-    -l {cpp,lua}
-                        [optional] Major programming language you want to use, should be [cpp | lua], default is cpp.
+    -l {cpp,lua,js}
+                        [optional] Major programming language you want to use, should be [cpp | lua | js], default is cpp.
     --portrait
                         [optional] set the project be portrait, default is landscape.
     -i[solated]
